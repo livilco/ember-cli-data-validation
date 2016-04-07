@@ -133,19 +133,49 @@ export default Ember.Mixin.create({
 		attribute.parentTypeKey = this.constructor.modelName ||
 			this.constructor.typeKey;
 
-		const errors = this.get('errors');
-
 		validators.forEach((validator) => {
 			const result = validator.validate(name, this.get(name), attribute, this);
-
-			if (typeof result === 'string') {
-				if(Ember.canInvoke(errors, '_add')) {
-					errors._add(name, result);
-				} else {
-					errors.add(name, result);	
-				}
-			}
+			this._addError(name, result);
 		});
+	},
+
+	/**
+	 * Validate a single Relationship.
+	 *
+	 * If the Relationship has defined validation, it would try to resolve
+	 * the the required Validators and run validation.
+	 *
+	 * For each failed validation, error message is added to the Errors
+	 * object for it's relationship key.
+	 *
+	 * @method _validateRelationship
+	 * @param  {Relationship} relationship
+	 * @private
+	 */
+	_validateRelationship: function(relationship) {
+		const validators = this.validatorsFor(relationship);
+		const key = relationship.key;
+
+		// Assign the Model name to the Relationship
+		relationship.parentTypeKey = this.constructor.modelName ||
+			this.constructor.typeKey;
+
+		validators.forEach((validator) => {
+			const result = validator.validate(key, this.get(key), relationship, this);
+			this._addError(key, result);
+		});
+	},
+
+	_addError: function(name, result) {
+		const errors = this.get('errors');
+
+		if (typeof result === 'string') {
+			if(Ember.canInvoke(errors, '_add')) {
+				errors._add(name, result);
+			} else {
+				errors.add(name, result);
+			}
+		}
 	},
 
 	/**
@@ -173,6 +203,10 @@ export default Ember.Mixin.create({
 
 		this.eachAttribute((key, attribute) => {
 			Ember.run(this, '_validateAttribute', attribute);
+		});
+
+		this.eachRelationship((key, relationship) => {
+			Ember.run(this, '_validateRelationship', relationship);
 		});
 
 		const isValid = Ember.get(errors, 'isEmpty');
