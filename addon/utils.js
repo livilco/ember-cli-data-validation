@@ -24,7 +24,7 @@ export function isBoolean(obj) {
  * Converts the input to Date instance.
  *
  * If the value can not be converted, `null` is returned.
- * 
+ *
  * @param  {*} value
  * @return {Date}
  */
@@ -38,6 +38,10 @@ export function toDate(value) {
 	} else {
 		value = Date.parse(value);
 	}
-	
+
 	return !isNaN(value) ? new Date(value) : null;
+}
+
+export function attrName(attributeOrRelationship) {
+	return attributeOrRelationship.name || attributeOrRelationship.key;
 }

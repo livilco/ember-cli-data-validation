@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import defaultMessages from 'ember-cli-data-validation/messages';
+import { attrName } from 'ember-cli-data-validation/utils';
 
 function dictionary() {
 	var dict = Object.create(null);
@@ -7,6 +8,7 @@ function dictionary() {
 	delete dict['_dict'];
 	return dict;
 }
+
 
 /**
  * Resolver used to resolve and locate the validation messages
@@ -107,15 +109,15 @@ export default Ember.Object.extend({
 	 * Attribute name.
 	 * 
 	 * @param  {Validator} validator
-	 * @param  {Attribute} attribute
+	 * @param  {Attribute|Relationship} attribute
 	 * @return {String}
 	 */
 	resolveLabel: function(validator, attribute) {
 		if (Ember.isPresent(attribute.options.label)) {
 			return attribute.options.label;
 		}
-
-		return attribute.name.replace(/(?:^\w|[A-Z]|\b\w)/g, function(match, index) {
+		
+		return attrName(attribute).replace(/(?:^\w|[A-Z]|\b\w)/g, function(match, index) {
 			return index === 0 ? match.toUpperCase() : ' ' + match.toLowerCase();
 		}).replace(/_/g, ' ');
 	},
@@ -125,7 +127,7 @@ export default Ember.Object.extend({
 	 *
 	 * @method parseName
 	 * @param  {Validator} validator
-	 * @param  {Attribute} attribute
+	 * @param  {Attribute|Relationship} attribute
 	 * @return {String}
 	 */
 	parseName: function(validator, attribute) {
@@ -138,7 +140,7 @@ export default Ember.Object.extend({
 			validatorType,
 			modelType,
 			validatorPath: validatorType + '.' + attributeType,
-			modelPath: modelType + '.' + attribute.name + '.' + validatorType
+			modelPath: modelType + '.' + attrName(attribute) + '.' + validatorType
 		};
 	},
 

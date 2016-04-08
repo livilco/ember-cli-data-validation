@@ -1,6 +1,7 @@
 import Ember from 'ember';
 import ValidationError from '../error';
 import defaultMessages from '../messages';
+import { attrName } from '../utils';
 
 function getOwner(obj) {
 	if(Ember.canInvoke(Ember, 'getOwner')) {
@@ -127,7 +128,7 @@ export default Ember.Mixin.create({
 	 */
 	_validateAttribute: function(attribute) {
 		const validators = this.validatorsFor(attribute);
-		const name = attribute.name;
+		const name = attrName(attribute);
 
 		// Assign the Model name to the Attribute
 		attribute.parentTypeKey = this.constructor.modelName ||
@@ -136,33 +137,6 @@ export default Ember.Mixin.create({
 		validators.forEach((validator) => {
 			const result = validator.validate(name, this.get(name), attribute, this);
 			this._addError(name, result);
-		});
-	},
-
-	/**
-	 * Validate a single Relationship.
-	 *
-	 * If the Relationship has defined validation, it would try to resolve
-	 * the the required Validators and run validation.
-	 *
-	 * For each failed validation, error message is added to the Errors
-	 * object for it's relationship key.
-	 *
-	 * @method _validateRelationship
-	 * @param  {Relationship} relationship
-	 * @private
-	 */
-	_validateRelationship: function(relationship) {
-		const validators = this.validatorsFor(relationship);
-		const key = relationship.key;
-
-		// Assign the Model name to the Relationship
-		relationship.parentTypeKey = this.constructor.modelName ||
-			this.constructor.typeKey;
-
-		validators.forEach((validator) => {
-			const result = validator.validate(key, this.get(key), relationship, this);
-			this._addError(key, result);
 		});
 	},
 
@@ -206,7 +180,7 @@ export default Ember.Mixin.create({
 		});
 
 		this.eachRelationship((key, relationship) => {
-			Ember.run(this, '_validateRelationship', relationship);
+			Ember.run(this, '_validateAttribute', relationship);
 		});
 
 		const isValid = Ember.get(errors, 'isEmpty');
