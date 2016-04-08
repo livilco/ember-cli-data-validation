@@ -194,7 +194,11 @@ export default Ember.Mixin.create({
 		return isValid;
 	},
 
-	save: function() {
+	save: function({validate=true}={}) {
+		if (!validate) {
+			return this._super();
+		}
+
 		if (this.validate()) {
 			return this._super();
 		}
