@@ -164,16 +164,23 @@ export default Ember.Mixin.create({
 	 * @method validate
 	 * @return {Boolean}
 	 */
-	validate: function() {
+	validate: function({willCommit=true}={}) {
+		let errors = this.get('errors');
+
+		if (!this.get('isValid')) {
+			this.send('becameValid');
+			errors._clear();
+		}
+
 		// Do not validate the records which are deleted
 		if (this.get('isDeleted')) {
 			return true;
 		}
 
-		// Move the Model into `inFlight` state
-		this.send('willCommit');
-
-		const errors = this.get('errors');
+		if (willCommit) {
+			// Move the Model into `inFlight` state
+			this.send('willCommit');
+		}
 
 		this.eachAttribute((key, attribute) => {
 			Ember.run(this, '_validateAttribute', attribute);
