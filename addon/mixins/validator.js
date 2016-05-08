@@ -192,9 +192,12 @@ export default Ember.Mixin.create({
 
 		const isValid = Ember.get(errors, 'isEmpty');
 
-		if(!isValid) {
-		  // From Ember Data 2.3.* it is required to manually trigger
-		  // `bacameInvalid` event in order to change the model state.
+		if (!isValid) {
+			// ensure the model is dirty - required if you have bypassed validation before and so the record in the root.loaded.saved state and now you would like to validate
+			this.send('becomeDirty');
+
+			// From Ember Data 2.3.* it is required to manually trigger
+			// `bacameInvalid` event in order to change the model state.
 			errors.trigger('becameInvalid');
 		}
 
