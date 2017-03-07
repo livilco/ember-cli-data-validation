@@ -11,7 +11,7 @@ function getOwner(obj) {
 	}
 }
 
-function createValidationError(model) {
+export function createValidationError(model) {
 	const messageResolver = lookupMessageResolver(getOwner(model));
 	const errors = model.get('errors');
 	let message = messageResolver.resolveMessage('error');
