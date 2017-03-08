@@ -192,7 +192,7 @@ export default Ember.Mixin.create({
 
 		const isValid = Ember.get(errors, 'isEmpty');
 
-		if (!isValid) {
+		if (!isValid && this.get('isValid')) {
 			// ensure the model is dirty - required if you have bypassed validation before and so the record in the root.loaded.saved state and now you would like to validate
 			this.send('becomeDirty');
 
