@@ -2,14 +2,7 @@ import Ember from 'ember';
 import ValidationError from '../error';
 import defaultMessages from '../messages';
 import { attrName } from '../utils';
-
-function getOwner(obj) {
-	if(Ember.canInvoke(Ember, 'getOwner')) {
-		return Ember.getOwner(obj);
-	} else {
-		return obj.container;
-	}
-}
+import getOwner from 'ember-getowner-polyfill';
 
 export function createValidationError(model) {
 	const messageResolver = lookupMessageResolver(getOwner(model));
@@ -82,7 +75,7 @@ export default Ember.Mixin.create({
 	 * @param  {Attribute}  attribute
 	 * @return {Validator}
 	 */
-	validatorsFor: function(attribute) {
+	validatorsFor(attribute) {
 		const meta = attribute.options;
 		let validations = Ember.get(meta, 'validation');
 
@@ -126,7 +119,7 @@ export default Ember.Mixin.create({
 	 * @param  {Attribute} attribute
 	 * @private
 	 */
-	_validateAttribute: function(attribute) {
+	_validateAttribute(attribute) {
 		const validators = this.validatorsFor(attribute);
 		const name = attrName(attribute);
 
@@ -204,8 +197,8 @@ export default Ember.Mixin.create({
 		return isValid;
 	},
 
-	save: function({validate=true}={}) {
-		if (!validate) {
+	save({validate=true}={}) {
+		if(!validate) {
 			return this._super();
 		}
 
