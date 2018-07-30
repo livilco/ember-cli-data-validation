@@ -2,7 +2,8 @@ import Ember from 'ember';
 import ValidationError from '../error';
 import defaultMessages from '../messages';
 import { attrName } from '../utils';
-import getOwner from 'ember-getowner-polyfill';
+
+const { getOwner } = Ember;
 
 export function createValidationError(model) {
 	const messageResolver = lookupMessageResolver(getOwner(model));
